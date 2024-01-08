@@ -10,8 +10,8 @@ int main()
     vector<vector<vector<int>>> target = load_ppm("tar.ppm");
     
 
-    int height = target.size();
-    int width = (height > 0) ? target[0].size() : 0;
+    unsigned int height = target.size();
+    unsigned int width = (height > 0) ? target[0].size() : 0;
     
     vector<vector<vector<int>>> result(height, vector<vector<int>>(width, vector<int>(3, 0)));
     int max = width * height;
@@ -21,31 +21,37 @@ int main()
 
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            vector<int> test = {x, y};
+            vector<int> test = {y, x};
             availableCoors.push_back(test);
         }
     }
-    cout << availableCoors.size() << endl;
+    cout << "avail size: " << availableCoors.size() << endl << endl << endl;
 
-    cout << "2\n";
+    int rand_i;
+    vector<int> coord;
+    vector<int> color;
+    vector<int> result_color;
     for (int i = 0; i < max; i++) {
-        int rand = std::rand() % availableCoors.size();  //
-        // int rand = getRandomNumber(0, availableCoors.size());
-        
-        vector<int> coord = availableCoors[rand];
-        
-        available_colors.erase(available_colors.begin() + rand);
+        rand_i = static_cast<int> ((std::rand() / double(RAND_MAX)) * availableCoors.size());  // scale to proper size...
+        coord = availableCoors[rand_i];
+        availableCoors.erase(availableCoors.begin() + rand_i);
 
-        vector<int> color = target[coord[0]][coord[1]];
-        // cout << "built\n";
-        vector<int> result_color = find_closest(color, available_colors);
+        // std::swap(availableCoors[rand_i], availableCoors.back());
+        // availableCoors.pop_back();
+
+        // cout << "coord: " << coord[0] << " " << coord[1] << endl;
+
+        color = target[coord[0]][coord[1]];
+        // cout << "color: " << color[0] << " " << color[1] << " " << color[2] << endl;
+        result_color = find_closest(color, available_colors);
         // cout << "found\n";
 
         result[coord[0]][coord[1]] = result_color;
-        if (!(i%1000)){
+
+        if (!(i%100)){
             cout << "still working!:)\n";
             cout << coord[0] << " " << coord[1] << endl;
-            cout << rand << endl;
+            cout << rand << " index: " << i << endl << endl;
         }
     }
 
