@@ -95,10 +95,7 @@ vector<vector<int>> proximity_list(int r) {
     vector<vector<int>> result;
     for (const auto& element : offsets) {
         result.push_back(element.second);
-        // printVector(element.second);
-        // cout << element.first << endl;
     }
-    // cout << result.size();
 
     return result;
 }
@@ -106,18 +103,20 @@ vector<vector<int>> proximity_list(int r) {
 vector<int> find_closest(vector<int> pixel, vector<vector<vector<bool>>>& available, vector<vector<int>>& offsets){
     bool found = false;
     //largest offset radius
-    int r = 5;
-    bool check_bounds = false;
-    for (const auto& c : pixel) {
-        if(c - r < 0 || c + r > 255 ) {
-            check_bounds = true;
-            break;
-        }
-    }
+    int r = 10;
+    bool check_bounds = true;
+    // bool check_bounds = false;
+    // for (const auto& c : pixel) {
+    //     if(c - r < 0 || c + r > 255 ) {
+    //         check_bounds = true;
+    //         break;
+    //     }
+    // }
+    int x,y,z;
     for (int i = 0; !found && i < offsets.size(); i++) {
-        int x = pixel[0] + offsets[i][0];
-        int y = pixel[1] + offsets[i][1];
-        int z = pixel[2] + offsets[i][2];
+        x = pixel[0] + offsets[i][0];
+        y = pixel[1] + offsets[i][1];
+        z = pixel[2] + offsets[i][2];
         bool out_of_bounds = false;
         if(check_bounds) {
             if(x < 0 || x > 255 ) {
@@ -133,70 +132,11 @@ vector<int> find_closest(vector<int> pixel, vector<vector<vector<bool>>>& availa
         if(!out_of_bounds) {
             if (available[x][y][z]) {
                 available[x][y][z] = false;
-                return {x,y,z};
-                // possible_coords.push_back(vector<int> {i, j, k});
-                // found = true;
+                break;
             }
 
         }
 
     }
-
-    // for (int r = 0; !found && r < X_IMAG ; r++){
-        // int lower_i = (pixel[0] - r < 0 ? 0 : pixel[0] - r);
-        // int upper_i = (pixel[0] + r > 255 ? 255 : pixel[0] + r);
-        // int lower_j = (pixel[1] - r < 0 ? 0 : pixel[1] - r);
-        // int upper_j = (pixel[1] + r > 255 ? 255 : pixel[1] + r);
-        // int lower_k = (pixel[2] - r < 0 ? 0 : pixel[2] - r);
-        // int upper_k = (pixel[2] + r > 255 ? 255 : pixel[2] + r);
-
-        // for (int i = lower_i; i < upper_i; i++){
-        //     for (int j = lower_j; j < upper_j; j++){
-        //         for (int k = lower_k; k < upper_k; k++){
-        //             // cout << i << " " << j << " " << k << "\n";
-        //             if (available[i][j][k]) {
-        //                 possible_coords.push_back(vector<int> {i, j, k});
-        //                 found = true;
-        //             }
-        //         }
-        //     }
-        // }
-    // }
-
-    // if (!found) {
-    //     cout << "failed";
-    //     throw runtime_error("Pixel not found!");
-    // }
-
-    // int N = possible_coords.size();
-    // vector<double> distances (N, 0);
-    // for (int i = 0; i < N; i++){
-    //     distances[i] = compute_dist(possible_coords[i], pixel);
-    // }
-
-    // int i_solution = find_smallest_i(distances);
-
-    // available[possible_coords[i_solution][0]][possible_coords[i_solution][1]][possible_coords[i_solution][2]] = false;
-
-    // return possible_coords[i_solution];
+    return {x,y,z};
 }
-
-// int find_smallest_i(vector<double> x){
-
-//     auto minIterator = min_element(x.begin(), x.end());
-
-//     if (minIterator != x.end()) {
-//         int index = distance(x.begin(), minIterator);
-//         return index;
-//     } else {
-//         return -1;
-//     }
-// }
-
-// double compute_dist(vector<int> p1, vector<int> p2){
-//     return sqrt(
-//         pow(p2[0] - p1[0], 2) +
-//         pow(p2[1] - p1[1], 2) +
-//         pow(p2[2] - p1[2], 2)
-//     );
-// }

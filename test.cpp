@@ -1,16 +1,16 @@
 #include "rgb.h"
-
+#include <chrono>
+#include <algorithm>
+#include <random>
 
 int main()
 {
-    auto prox = proximity_list(5);
-    // return 0;
+    auto prox = proximity_list(10);
     std::srand(static_cast<unsigned>(std::time(0)));
 
-    vector<vector<vector<bool>>> available_colors(255, vector<vector<bool>>(255, vector<bool>(255, true)));
+    vector<vector<vector<bool>>> available_colors(256, vector<vector<bool>>(256, vector<bool>(256, true)));
 
     vector<vector<vector<int>>> target = load_ppm("tar.ppm");
-    
 
     unsigned int height = target.size();
     unsigned int width = (height > 0) ? target[0].size() : 0;
@@ -19,7 +19,6 @@ int main()
     int max = width * height;
 
     vector<vector<int>> availableCoors;
-
 
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
@@ -33,22 +32,22 @@ int main()
     vector<int> coord;
     vector<int> color;
     vector<int> result_color;
+    auto rng = std::default_random_engine {};
+
+    random_device rd;
+    mt19937 g(rd());
+    shuffle(availableCoors.begin(), availableCoors.end(), g);
+
     for (int i = 0; i < max; i++) {
-        rand_i = static_cast<int> ((std::rand() / double(RAND_MAX)) * availableCoors.size());  // scale to proper size...
-        coord = availableCoors[rand_i];
-        availableCoors.erase(availableCoors.begin() + rand_i);
-
-        // std::swap(availableCoors[rand_i], availableCoors.back());
-        // availableCoors.pop_back();
-
-        // cout << "coord: " << coord[0] << " " << coord[1] << endl;
-
+        // auto start = std::chrono::high_resolution_clock::now();
+        coord = availableCoors[i];
         color = target[coord[0]][coord[1]];
-        // cout << "color: " << color[0] << " " << color[1] << " " << color[2] << endl;
         result_color = find_closest(color, available_colors, prox);
-        // cout << "found\n";
-
         result[coord[0]][coord[1]] = result_color;
+        // auto stop = std::chrono::high_resolution_clock::now();
+
+        // auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+        // std::cout << duration.count() << " nanoseconds" << std::endl;
 
         if (!(i%100)){
             cout << "still working!:)\n";
