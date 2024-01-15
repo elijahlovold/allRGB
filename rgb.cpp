@@ -103,7 +103,7 @@ vector<vector<int>> proximity_list(int r) {
 vector<int> find_closest(vector<int> pixel, vector<vector<vector<bool>>>& available, vector<vector<int>>& offsets){
     bool found = false;
     //largest offset radius
-    int r = 10;
+    int r = 100;
     bool check_bounds = true;
     // bool check_bounds = false;
     // for (const auto& c : pixel) {
@@ -132,11 +132,15 @@ vector<int> find_closest(vector<int> pixel, vector<vector<vector<bool>>>& availa
         if(!out_of_bounds) {
             if (available[x][y][z]) {
                 available[x][y][z] = false;
+                found = true;
                 break;
             }
 
         }
 
+    }
+    if(!found) {
+        cout << "Error, color not found";
     }
     return {x,y,z};
 }

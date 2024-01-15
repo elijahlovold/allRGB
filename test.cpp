@@ -5,7 +5,8 @@
 
 int main()
 {
-    auto prox = proximity_list(10);
+    auto start = std::chrono::high_resolution_clock::now();
+    auto prox = proximity_list(100);
     std::srand(static_cast<unsigned>(std::time(0)));
 
     vector<vector<vector<bool>>> available_colors(256, vector<vector<bool>>(256, vector<bool>(256, true)));
@@ -39,23 +40,20 @@ int main()
     shuffle(availableCoors.begin(), availableCoors.end(), g);
 
     for (int i = 0; i < max; i++) {
-        // auto start = std::chrono::high_resolution_clock::now();
         coord = availableCoors[i];
         color = target[coord[0]][coord[1]];
         result_color = find_closest(color, available_colors, prox);
         result[coord[0]][coord[1]] = result_color;
-        // auto stop = std::chrono::high_resolution_clock::now();
 
-        // auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-        // std::cout << duration.count() << " nanoseconds" << std::endl;
 
-        if (!(i%100)){
-            cout << "still working!:)\n";
-            cout << coord[0] << " " << coord[1] << endl;
-            cout << rand << " index: " << i << endl << endl;
+        if (!(i%10000)){
+            cout << " index: " << i << "/" << max << endl << endl;
         }
     }
 
     write_ppm("test.ppm", result);
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
+    std::cout << duration.count() << " nanoseconds" << std::endl;
 }
 
