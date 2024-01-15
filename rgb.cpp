@@ -59,31 +59,74 @@ void write_ppm(const string& filename, vector<vector<vector<int>>> image) {
     cout << filename << " done writing\n";
 }
 
-vector<int> find_closest(vector<int> pixel, vector<vector<vector<bool>>>& available){
+double dist_from_origin(vector<int> p1){
+    vector<int> origin = {0,0,0};
+    if(p1 == origin) {
+        return 0;
+    }
+    return sqrt(
+        pow(0 - p1[0], 2) +
+        pow(0 - p1[1], 2) +
+        pow(0 - p1[2], 2)
+    );
+}
+
+void printVector(const std::vector<int>& v) {
+    for (int i = 0; i < v.size(); ++i) {
+        std::cout << v[i];
+        if (i < v.size() - 1) {
+            std::cout << ", ";
+        }
+    }
+    std::cout << std::endl;
+}
+
+vector<vector<int>> proximity_list(int r) {
+    vector<pair<double, vector<int>>> offsets;
+    for (int x = -r; x < r; x++){
+        for (int y = -r; y < r; y++){
+            for (int z = -r; z < r; z++){
+                double dist = dist_from_origin({x,y,z});
+                offsets.push_back(make_pair(dist, vector<int>{x,y,z}));
+            }
+        }
+    }
+    sort(offsets.begin(), offsets.end());
+    vector<vector<int>> result;
+    for (const auto& element : offsets) {
+        result.push_back(element.second);
+        // printVector(element.second);
+        // cout << element.first << endl;
+    }
+    // cout << result.size();
+
+    return result;
+}
+
+vector<int> find_closest(vector<int> pixel, vector<vector<vector<bool>>>& available, vector<vector<int>>& prox){
     // cout << pixel[0] << " " << pixel[1] << " " << pixel[2] << endl;
 
     bool found = false;
     vector<vector<int>> possible_coords;
     for (int r = 0; !found && r < X_IMAG ; r++){
+        // int lower_i = (pixel[0] - r < 0 ? 0 : pixel[0] - r);
+        // int upper_i = (pixel[0] + r > 255 ? 255 : pixel[0] + r);
+        // int lower_j = (pixel[1] - r < 0 ? 0 : pixel[1] - r);
+        // int upper_j = (pixel[1] + r > 255 ? 255 : pixel[1] + r);
+        // int lower_k = (pixel[2] - r < 0 ? 0 : pixel[2] - r);
+        // int upper_k = (pixel[2] + r > 255 ? 255 : pixel[2] + r);
 
-        int lower_i = (pixel[0] - r < 0 ? 0 : pixel[0] - r);
-        int upper_i = (pixel[0] + r > 255 ? 255 : pixel[0] + r);
-        int lower_j = (pixel[1] - r < 0 ? 0 : pixel[1] - r);
-        int upper_j = (pixel[1] + r > 255 ? 255 : pixel[1] + r);
-        int lower_k = (pixel[2] - r < 0 ? 0 : pixel[2] - r);
-        int upper_k = (pixel[2] + r > 255 ? 255 : pixel[2] + r);
-
-        for (int i = lower_i; i < upper_i; i++){
-            for (int j = lower_j; j < upper_j; j++){
-                for (int k = lower_k; k < upper_k; k++){
-                    // cout << i << " " << j << " " << k << "\n";
-                    if (available[i][j][k]) {
-                        possible_coords.push_back(vector<int> {i, j, k});
-                        found = true;
-                    }
-                }
-            }
-        }
+        // for (int i = lower_i; i < upper_i; i++){
+        //     for (int j = lower_j; j < upper_j; j++){
+        //         for (int k = lower_k; k < upper_k; k++){
+        //             // cout << i << " " << j << " " << k << "\n";
+        //             if (available[i][j][k]) {
+        //                 possible_coords.push_back(vector<int> {i, j, k});
+        //                 found = true;
+        //             }
+        //         }
+        //     }
+        // }
     }
 
     if (!found) {

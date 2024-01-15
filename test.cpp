@@ -3,6 +3,8 @@
 
 int main()
 {
+    auto prox = proximity_list(5);
+    // return 0;
     std::srand(static_cast<unsigned>(std::time(0)));
 
     vector<vector<vector<bool>>> available_colors(255, vector<vector<bool>>(255, vector<bool>(255, true)));
@@ -43,7 +45,7 @@ int main()
 
         color = target[coord[0]][coord[1]];
         // cout << "color: " << color[0] << " " << color[1] << " " << color[2] << endl;
-        result_color = find_closest(color, available_colors);
+        result_color = find_closest(color, available_colors, prox);
         // cout << "found\n";
 
         result[coord[0]][coord[1]] = result_color;
