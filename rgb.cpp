@@ -59,76 +59,89 @@ void write_ppm(const string& filename, vector<vector<vector<int>>> image) {
     cout << filename << " done writing\n";
 }
 
-vector<int> find_closest(vector<int> pixel, vector<vector<vector<bool>>>& available){
-    // cout << pixel[0] << " " << pixel[1] << " " << pixel[2] << endl;
-
-    bool found = false;
-    vector<vector<int>> possible_coords;
-    for (int r = 0; !found && r < X_IMAG ; r++){
-
-        int lower_i = (pixel[0] - r < 0 ? 0 : pixel[0] - r);
-        int upper_i = (pixel[0] + r > 255 ? 255 : pixel[0] + r);
-        int lower_j = (pixel[1] - r < 0 ? 0 : pixel[1] - r);
-        int upper_j = (pixel[1] + r > 255 ? 255 : pixel[1] + r);
-        int lower_k = (pixel[2] - r < 0 ? 0 : pixel[2] - r);
-        int upper_k = (pixel[2] + r > 255 ? 255 : pixel[2] + r);
-
-        for (int i = lower_i; i < upper_i; i++){
-            for (int j = lower_j; j < upper_j; j++){
-                for (int k = lower_k; k < upper_k; k++){
-                    // cout << i << " " << j << " " << k << "\n";
-                    if (available[i][j][k]) {
-                        possible_coords.push_back(vector<int> {i, j, k});
-                        found = true;
-                    }
-                }
-            }
-        }
+double dist_from_origin(vector<int> p1){
+    vector<int> origin = {0,0,0};
+    if(p1 == origin) {
+        return 0;
     }
-
-    if (!found) {
-        cout << "failed";
-        throw runtime_error("Pixel not found!");
-    }
-
-    int N = possible_coords.size();
-    vector<double> distances (N, 0);
-    for (int i = 0; i < N; i++){
-        distances[i] = compute_dist(possible_coords[i], pixel);
-    }
-
-    int i_solution = find_smallest_i(distances);
-
-    available[possible_coords[i_solution][0]][possible_coords[i_solution][1]][possible_coords[i_solution][2]] = false;
-
-    return possible_coords[i_solution];
-}
-
-int find_smallest_i(vector<double> x){
-
-    auto minIterator = min_element(x.begin(), x.end());
-
-    if (minIterator != x.end()) {
-        int index = distance(x.begin(), minIterator);
-        return index;
-    } else {
-        return -1;
-    }
-}
-
-double compute_dist(vector<int> p1, vector<int> p2){
     return sqrt(
-        pow(p2[0] - p1[0], 2) +
-        pow(p2[1] - p1[1], 2) +
-        pow(p2[2] - p1[2], 2)
+        pow(0 - p1[0], 2) +
+        pow(0 - p1[1], 2) +
+        pow(0 - p1[2], 2)
     );
 }
 
-int getRandomNumber(int min, int max) {
-    // Random number generator
-    std::random_device rd;  // Obtain a random number from hardware
-    std::mt19937 gen(rd()); // Seed the generator
-    std::uniform_int_distribution<> distr(min, max); // Define the range
+void printVector(const std::vector<int>& v) {
+    for (int i = 0; i < v.size(); ++i) {
+        std::cout << v[i];
+        if (i < v.size() - 1) {
+            std::cout << ", ";
+        }
+    }
+    std::cout << std::endl;
+}
 
-    return distr(gen); // Generate a random number within the given range
+vector<vector<int>> proximity_list(int r) {
+    vector<pair<double, vector<int>>> offsets;
+    for (int x = -r; x < r; x++){
+        for (int y = -r; y < r; y++){
+            for (int z = -r; z < r; z++){
+                double dist = dist_from_origin({x,y,z});
+                offsets.push_back(make_pair(dist, vector<int>{x,y,z}));
+            }
+        }
+    }
+    sort(offsets.begin(), offsets.end());
+    vector<vector<int>> result;
+    for (const auto& element : offsets) {
+        result.push_back(element.second);
+    }
+
+    return result;
+}
+
+vector<int> find_closest(vector<int> pixel, vector<vector<vector<bool>>>& available, vector<vector<int>>& offsets){
+    bool found = false;
+    //largest offset radius
+    int r = 100;
+    bool check_bounds = true;
+    // bool check_bounds = false;
+    // for (const auto& c : pixel) {
+    //     if(c - r < 0 || c + r > 255 ) {
+    //         check_bounds = true;
+    //         break;
+    //     }
+    // }
+    int x,y,z;
+    for (int i = 0; !found && i < offsets.size(); i++) {
+        x = pixel[0] + offsets[i][0];
+        y = pixel[1] + offsets[i][1];
+        z = pixel[2] + offsets[i][2];
+        bool out_of_bounds = false;
+        if(check_bounds) {
+            if(x < 0 || x > 255 ) {
+                out_of_bounds = true;
+            }
+            if(y < 0 || y > 255 ) {
+                out_of_bounds = true;
+            }
+            if(z < 0 || z > 255 ) {
+                out_of_bounds = true;
+            }
+        }
+        if(!out_of_bounds) {
+            if (available[x][y][z]) {
+                available[x][y][z] = false;
+                found = true;
+                break;
+            }
+
+        }
+
+    }
+    if(!found) {
+        cout << "Error, color not found";
+        throw runtime_error("Pixel not found!");
+    }
+    return {x,y,z};
 }
