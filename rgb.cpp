@@ -141,6 +141,7 @@ vector<int> find_closest(vector<int> pixel, vector<vector<vector<bool>>>& availa
     }
     if(!found) {
         cout << "Error, color not found";
+        throw runtime_error("Pixel not found!");
     }
     return {x,y,z};
 }
